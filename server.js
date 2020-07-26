@@ -61,13 +61,14 @@ app.get('/location', (request, response) => {
 
 
 app.get('/weather', (request, response) => {
-    const data = require('./data/weather.json');
+    const dataWeather = require('./data/weather.json');
     let city = request.query.city;
-    data.data.forEach(element => {
+    Weather.all = [];
+    dataWeather.data.forEach(element => {
         const time = new Date(element.valid_date);
         let longTimeStamp = time.toString();
-        let weatherData = new Weather(city, element, longTimeStamp.toString().substr(0, 15)
-        );
+        let weatherData = new Weather(city, element, longTimeStamp.substr(0, 15));
+        // let weatherData = new Weather(city,element);
 
     });
     response.send(Weather.all);
@@ -75,13 +76,15 @@ app.get('/weather', (request, response) => {
 
 // route 3
 
-// app.all('*', (request, response) =>{
-//     response.status(500).send('Sorry, something went wrong');
-//   });
+app.all('*', (request, response) =>{
+    response.status(500).send('Sorry, something went wrong');
+  });
 
 app.listen(PORT, () => {
     console.log('Server is listening to port ', PORT);
 });
+
+// constructres
 
 function Location(city, data) {
     this.search_query = city;
@@ -89,14 +92,21 @@ function Location(city, data) {
     this.latitude = data[0].lat;
     this.longitude = data[0].lon;
 }
-
 function Weather(city, data, date) {
 
     this.forecast = data.weather.description;
     this.time = date;
     Weather.all.push(this);
 }
-Weather.all = [];
+
+
+// function Weather(city, data) {
+
+//     this.forecast = data.weather.description;
+//     this.time = data.datetime;
+//     Weather.all.push(this);
+// }
+
 
 
 
