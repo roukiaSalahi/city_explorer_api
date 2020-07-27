@@ -3,7 +3,7 @@ const server = require('express');
 const cors = require('cors');
 // const { request } = require('express');
 require('dotenv').config();
-
+const superagent = require('superagent');
 const app = server();
 app.use(cors());
 
@@ -18,67 +18,62 @@ app.get('/', (request, response) => {
 });
 
 // route 1 
-// http://localhost:3100/location?city=amman
+// http://localhost:3000/location?city=amman
 // http://localhost:3000/location
 
-// Example Response:
-
-// ```
-// {
-//   "search_query": "seattle",
-//   "formatted_query": "Seattle, WA, USA",
-//   "latitude": "47.606210",
-//   "longitude": "-122.332071"
-// }
-// ``
-
 app.get('/location', (request, response) => {
-    const data = require('./data/location.json');
     let city = request.query.city;
-    let locationData = new Location(city, data);
-    response.send(locationData);
+    let APIKEYL = process.env.APIKEYL;
+    let url = `https://eu1.locationiq.com/v1/search.php?key=${APIKEYL}&q=${city}&format=json`;
+    superagent.get(url).then(data => {
+        let locationData = new Location(city, data.body);
+        response.send(locationData);
+    });
+
 });
 
-// route 2 
-// http://localhost:3100/weather?city=amman
-// http://localhost:3000/weather
-
-// Example Response:
-
-// ```
-// [
-//   {
-//     "forecast": "Partly cloudy until afternoon.",
-//     "time": "Mon Jan 01 2001"
-//   },
-//   {
-//     "forecast": "Mostly cloudy in the morning.",
-//     "time": "Tue Jan 02 2001"
-//   },
-//   ...
-// ]
-// ```
-
+// route 2
 
 app.get('/weather', (request, response) => {
-    const dataWeather = require('./data/weather.json');
-    let city = request.query.city;
+    let city = request.query.search_query;
+    let APIKEYW = process.env.APIKEYW;
+    let url = `https://api.weatherbit.io/v2.0/forecast/daily?city=${city}&key=${APIKEYW}`;
     Weather.all = [];
-    dataWeather.data.forEach(element => {
-        const time = new Date(element.valid_date);
-        let longTimeStamp = time.toString();
-        let weatherData = new Weather(city, element, longTimeStamp.substr(0, 15));
-        // let weatherData = new Weather(city,element);
+    superagent.get(url).then(data => {
 
+        data.body.data.forEach(element => {
+            let weatherData = new Weather(city, element);
+            console.log(data);
+        });
+        response.send(Weather.all);
     });
-    response.send(Weather.all);
-});
+})
 
-// route 3
+// route 3 
+// app.get(`/trails`, (request, response) => {
+//     let city = request.query.city;
+//     let APIKEYH = process.env.APIKEYH;
+//     let url = `https://www.hikingproject.com/data/get-trails?lat=40.0274&lon=-105.2519&key=200852284-73f`;
+//     Weather.all = [];
+//     superagent.get(url).then(data => {
+//         data.forEach(element => {
+//             let weatherData = new Weather(city, element);
+//         });
+//         response.send(Weather.all);
+//     });
+// })
 
-app.all('*', (request, response) =>{
+
+
+
+
+
+
+// route 4
+
+app.all('*', (request, response) => {
     response.status(500).send('Sorry, something went wrong');
-  });
+});
 
 app.listen(PORT, () => {
     console.log('Server is listening to port ', PORT);
@@ -92,20 +87,12 @@ function Location(city, data) {
     this.latitude = data[0].lat;
     this.longitude = data[0].lon;
 }
-function Weather(city, data, date) {
-
+function Weather(city, data) {
     this.forecast = data.weather.description;
-    this.time = date;
+    this.time = new Date(data.valid_date).toString().slice(0, 15);
     Weather.all.push(this);
 }
 
-
-// function Weather(city, data) {
-
-//     this.forecast = data.weather.description;
-//     this.time = data.datetime;
-//     Weather.all.push(this);
-// }
 
 
 
