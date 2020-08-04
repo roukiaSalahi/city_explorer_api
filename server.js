@@ -38,6 +38,7 @@ app.get('/location', (request, response) => {
                 let locationData = new Location(city, data.body);
                 let queryValues = [locationData.search_query, locationData.formatted_query, locationData.latitude, locationData.longitude]
                 let SQL = `INSERT INTO locations (search_query, formatted_query, latitude, longitude) VALUES ($1,$2,$3,$4)`;
+               
                 client.query(SQL, queryValues).then(result => {
                     response.send(locationData);
                 });
@@ -96,8 +97,7 @@ function Location(city, data) {
     this.formatted_query = data[0].display_name; // because the data is in array reponse send (data.body) and see the data
     this.latitude = data[0].lat;
     this.longitude = data[0].lon;
-    locationLat.push(data[0].lat);
-    locationLon.push(data[0].lon);
+   
 }
 function Weather(data) {
     this.forecast = data.weather.description;
