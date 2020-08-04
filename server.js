@@ -30,9 +30,11 @@ app.get('/location', (request, response) => {
     let APIKEYL = process.env.APIKEYL;
     let url = `https://eu1.locationiq.com/v1/search.php?key=${APIKEYL}&q=${city}&format=json`;
     let selectSQL = `SELECT * FROM locations WHERE search_query ='${city}'`;
+
     client.query(selectSQL).then(result => {
         if (result.rowCount) {
-            response.send(result.rows);
+            
+            response.send(result.rows[0]);
         } else {
             superagent.get(url).then(data => {
                 let locationData = new Location(city, data.body);
