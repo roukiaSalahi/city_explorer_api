@@ -119,11 +119,18 @@ app.get('/movies', (request, response) => {
 //http://localhost:3000/yelp?latitude=35.2&longitude=35.3
 
 app.get('/yelp', (request, response) => {
-    let longitude = request.query.longitude;
-    let latitude = request.query.latitude;
+    let page = request.query.page;
+    let offset = (page - 1 )* 5;
+    let queryParam = {
+        'latitude':request.query.latitude,
+        'longitude':request.query.longitude,
+        'offset': offset,
+        'limit': 5 
+    }
+   
     let APIKEYR = process.env.APIKEYR;
-    let url = `https://api.yelp.com/v3/businesses/search?latitude=${latitude}&longitude=${longitude}`;
-    superagent.get(url).set('Authorization', `Bearer ${APIKEYR}`).then(data => {
+    let url = `https://api.yelp.com/v3/businesses/search`;
+    superagent.get(url).query(queryParam).set('Authorization', `Bearer ${APIKEYR}`).then(data => {
         const resturantInfo = [];
         data.body.businesses.map(element => {
             let resturantData = new Resturant(element);
@@ -136,23 +143,11 @@ app.get('/yelp', (request, response) => {
 
 // route 6
 
-// app.all('*', (request, response) => {
-//     response.status(500).send('Sorry, something went wrong');
-// });
+app.all('*', (request, response) => {
+    response.status(500).send('Sorry, something went wrong');
+});
 
-app.all('*', (req, res, next) => {
-    console.log(`${req.method} ${req.url}`);
-    res.setHeader('Access-Control-Allow-Origin', '*');
-    res.setHeader(
-      'Access-Control-Allow-Methods',
-      'GET, HEAD, PUT, PATCH, POST, DELETE'
-    );
-    res.setHeader(
-      'Access-Control-Allow-Headers',
-      'Origin, X-Requested-With, Content-Type, Accept, Authorization'
-    );
-    next();
-  });
+
 
 
 // constructers
