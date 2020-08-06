@@ -13,6 +13,20 @@ app.use(cors());
 const PORT = process.env.PORT || 3100;
 const client = new pg.Client(process.env.DATABASE_URL);
 
+app.all('*', (req, res, next) => {
+    console.log(`${req.method} ${req.url}`);
+    res.setHeader('Access-Control-Allow-Origin', '*');
+    res.setHeader(
+      'Access-Control-Allow-Methods',
+      'GET, HEAD, PUT, PATCH, POST, DELETE'
+    );
+    res.setHeader(
+      'Access-Control-Allow-Headers',
+      'Origin, X-Requested-With, Content-Type, Accept, Authorization'
+    );
+    next();
+  });
+  
 // home page .. 
 app.get('/', (request, response) => {
     response.status(200).send('This is the homepage');
@@ -140,19 +154,7 @@ app.get('/yelp', (request, response) => {
 //     response.status(500).send('Sorry, something went wrong');
 // });
 
-app.all('*', (req, res, next) => {
-    console.log(`${req.method} ${req.url}`);
-    res.setHeader('Access-Control-Allow-Origin', '*');
-    res.setHeader(
-      'Access-Control-Allow-Methods',
-      'GET, HEAD, PUT, PATCH, POST, DELETE'
-    );
-    res.setHeader(
-      'Access-Control-Allow-Headers',
-      'Origin, X-Requested-With, Content-Type, Accept, Authorization'
-    );
-    next();
-  });
+
 
 
 // constructers
