@@ -136,9 +136,24 @@ app.get('/yelp', (request, response) => {
 
 // route 6
 
-app.all('*', (request, response) => {
-    response.status(500).send('Sorry, something went wrong');
-});
+// app.all('*', (request, response) => {
+//     response.status(500).send('Sorry, something went wrong');
+// });
+
+app.all('*', (req, res, next) => {
+    console.log(`${req.method} ${req.url}`);
+    res.setHeader('Access-Control-Allow-Origin', '*');
+    res.setHeader(
+      'Access-Control-Allow-Methods',
+      'GET, HEAD, PUT, PATCH, POST, DELETE'
+    );
+    res.setHeader(
+      'Access-Control-Allow-Headers',
+      'Origin, X-Requested-With, Content-Type, Accept, Authorization'
+    );
+    next();
+  });
+
 
 // constructers
 
