@@ -26,7 +26,7 @@ app.all('*', (req, res, next) => {
     );
     next();
   });
-  
+
 // home page .. 
 app.get('/', (request, response) => {
     response.status(200).send('This is the homepage');
@@ -136,7 +136,7 @@ app.get('/yelp', (request, response) => {
     let longitude = request.query.longitude;
     let latitude = request.query.latitude;
     let APIKEYR = process.env.APIKEYR;
-    let url = `https://api.yelp.com/v3/businesses/search?latitude=${latitude}&longitude=${longitude}`;
+    let url = `https://api.yelp.com/v3/businesses/search?term=restaurants&latitude=${latitude}&longitude=${longitude}`;
     superagent.get(url).set('Authorization', `Bearer ${APIKEYR}`).then(data => {
         const resturantInfo = [];
         data.body.businesses.map(element => {
@@ -150,9 +150,9 @@ app.get('/yelp', (request, response) => {
 
 // route 6
 
-// app.all('*', (request, response) => {
-//     response.status(500).send('Sorry, something went wrong');
-// });
+app.all('*', (request, response) => {
+    response.status(500).send('Sorry, something went wrong');
+});
 
 
 
